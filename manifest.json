@@ -2,7 +2,7 @@
     "package": "latex_svg_tikz_inkscape_v2",
     "name": "LaTeX TikZ Inkscape (macOS Path Fixed)",
     "author": "Custom Build",
-    "version": "1.1.0",
+    "version": "1.1",
     "description": "LuaLaTeX + Inkscape pipeline with macOS Homebrew PATH fix",
     "ankiweb_id": "",
     "homepage": "",
