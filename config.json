@@ -1,0 +1,36 @@
+{
+    "svgCommands": [
+        [
+            "lualatex",
+            "-interaction=nonstopmode",
+            "--shell-escape",
+            "tmp.tex"
+        ],
+        [
+            "inkscape",
+            "--pdf-poppler",
+            "--export-text-to-path",
+            "--export-plain-svg",
+            "--export-area-drawing",
+            "--export-filename=tmp.svg",
+            "tmp.pdf"
+        ]
+    ],
+    "pngCommands": [
+        [
+            "lualatex",
+            "-interaction=nonstopmode",
+            "--shell-escape",
+            "tmp.tex"
+        ],
+        [
+            "convert",
+            "-density",
+            "300",
+            "-trim",
+            "tmp.pdf",
+            "tmp.png"
+        ]
+    ]
+}
+
