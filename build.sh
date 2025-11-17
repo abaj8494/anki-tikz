@@ -3,21 +3,24 @@
 ADDON_NAME="latex_svg_tikz_inkscape_v2"
 OUTPUT_FILE="${ADDON_NAME}.ankiaddon"
 
-# Clean up any Python cache
-find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-find . -type f -name "*.pyc" -delete 2>/dev/null || true
-
-# Remove old package
 rm -f "$OUTPUT_FILE"
 
-# Create package - ensure files are at root level, not in subfolder
-zip "$OUTPUT_FILE" \
+zip -r "$OUTPUT_FILE" \
     __init__.py \
     manifest.json \
     config.json \
     README.md
 
-echo "Package created: $OUTPUT_FILE"
+echo "✓ Package created: $OUTPUT_FILE"
 echo ""
-echo "Contents:"
-unzip -l "$OUTPUT_FILE"
+echo "This version fixes the macOS PATH issue!"
+echo ""
+echo "Installation:"
+echo "1. Uninstall previous LaTeX addon"
+echo "2. Tools > Add-ons > Install from file..."
+echo "3. Select $OUTPUT_FILE"
+echo "4. Restart Anki"
+echo ""
+echo "The debug console should show:"
+echo "  ✓ inkscape found at: /opt/homebrew/bin/inkscape"
+
