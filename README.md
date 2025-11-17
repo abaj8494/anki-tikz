@@ -1,59 +1,36 @@
-# anki-tikz
+# LaTeX TikZ with Inkscape - macOS Path Fixed
 
-Render TikZ diagrams in Anki using LuaLaTeX and Inkscape.
+This version fixes the PATH issue on macOS where Anki can't find Inkscape.
 
-## Requirements
+## What Was Fixed
 
-- Anki 23.10 or later (tested on 25.07.5)
-- LuaLaTeX (TeX Live 2024+ or MiKTeX)
-- Inkscape 1.0+
+macOS GUI apps (like Anki) don't inherit the shell's PATH. Even though `which inkscape` works in Terminal, Anki couldn't find it.
 
-Install on macOS:
-```bash
-brew install --cask mactex inkscape
-```
-
-Install on Linux:
-```bash
-sudo apt-get install texlive-luatex inkscape
-```
+This version adds `/opt/homebrew/bin` and other common paths to the environment before running LaTeX commands.
 
 ## Installation
 
-1. Download the latest `.ankiaddon` file from releases
-2. In Anki: Tools > Add-ons > Install from file
-3. Restart Anki
-4. Verify installation in Tools > Debug Console
+1. **Uninstall previous version**:
+   - Tools > Add-ons
+   - Delete "LaTeX TikZ Inkscape"
+   - Restart Anki
 
-Expected output:
-```
-LaTeX TikZ Inkscape: PATH updated to include Homebrew and TeX
-LaTeX TikZ Inkscape: inkscape found at: /opt/homebrew/bin/inkscape
-```
+2. **Install this version**:
+   - Tools > Add-ons > Install from file...
+   - Select `latex_svg_tikz_inkscape_v2.ankiaddon`
+   - Restart Anki
 
-## Configuration
+3. **Verify**:
+   - Tools > Debug Console
+   - Look for:
+     ```
+     LaTeX TikZ Inkscape: PATH updated to include Homebrew and TeX
+     LaTeX TikZ Inkscape: ✓ inkscape found at: /opt/homebrew/bin/inkscape
+     ```
 
-The addon uses LuaLaTeX to compile TikZ diagrams to PDF, then Inkscape to convert PDF to SVG.
+## Test It
 
-Default pipeline:
-```
-LaTeX source → LuaLaTeX → PDF → Inkscape → SVG
-```
-
-Configure your note type's LaTeX preamble (Tools > Manage Note Types > Options):
-
-```latex
-\documentclass[12pt]{article}
-\usepackage{tikz}
-\usepackage{amsmath,amssymb}
-\usetikzlibrary{arrows,positioning,calc}
-\pagestyle{empty}
-\begin{document}
-```
-
-## Usage
-
-Use standard Anki LaTeX syntax with TikZ code:
+Create a card with:
 
 ```latex
 [$$]
@@ -65,13 +42,16 @@ Use standard Anki LaTeX syntax with TikZ code:
 [/$$]
 ```
 
-Note: Replace `[$$]` and `[/$$]` with actual LaTeX delimiters (square brackets with dollar signs).
+Should render perfectly now!
 
-First render takes approximately 5-10 seconds. Subsequent displays are instant as images are cached.
+## The Pipeline
 
-## Configuration File
+1. **LuaLaTeX → PDF**: `lualatex tmp.tex` → `tmp.pdf` ✅ (This was working)
+2. **Inkscape → SVG**: `inkscape tmp.pdf` → `tmp.svg` ✅ (Now will work)
 
-Advanced users can modify `config.json`:
+## Configuration
+
+Same as before - your Emacs-style pipeline:
 
 ```json
 {
@@ -90,76 +70,9 @@ Advanced users can modify `config.json`:
 }
 ```
 
-To use XeLaTeX instead:
-```json
-{
-    "svgCommands": [
-        ["xelatex", "-interaction=nonstopmode", "--shell-escape", "tmp.tex"],
-        ["inkscape", ...]
-    ]
-}
+Your preamble (Tools > Manage Note Types > Options):
+```latex
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,calc}
 ```
 
-## Troubleshooting
-
-### Inkscape not found
-
-On macOS, if Inkscape is installed as an application:
-```bash
-sudo ln -s /Applications/Inkscape.app/Contents/MacOS/inkscape /usr/local/bin/inkscape
-```
-
-Or add to PATH in shell config:
-```bash
-export PATH="/Applications/Inkscape.app/Contents/MacOS:$PATH"
-```
-
-### LaTeX errors
-
-Check the log file at:
-- macOS/Linux: `/tmp/anki_temp/latex_log.txt`
-- Windows: `%TEMP%\anki_temp\latex_log.txt`
-
-Verify LaTeX installation:
-```bash
-lualatex --version
-inkscape --version
-```
-
-### Missing TikZ libraries
-
-Install additional packages:
-```bash
-sudo tlmgr install pgf tikz-cd circuitikz
-```
-
-## Technical Details
-
-The addon overrides Anki's `latex.svgCommands` to use LuaLaTeX instead of the default latex engine. Inkscape converts the resulting PDF to SVG with:
-
-- `--pdf-poppler`: Use Poppler for PDF rendering
-- `--export-text-to-path`: Convert text to paths (eliminates font dependencies)
-- `--export-plain-svg`: Generate clean SVG without metadata
-- `--export-area-drawing`: Crop to content bounds
-
-Generated SVG files are stored in Anki's media collection and sync across devices.
-
-## Compatibility
-
-- Anki 23.10+: Full support
-- Anki 25.07.5: Tested and working
-- AnkiMobile/AnkiDroid: Pre-rendered images sync and display correctly
-
-The addon uses `gui_hooks.profile_did_open` to ensure proper initialization after Anki loads.
-
-## Building
-
-```bash
-./build.sh
-```
-
-Produces `latex_svg_tikz_inkscape_v2.ankiaddon`.
-
-## License
-
-See LICENSE file.
